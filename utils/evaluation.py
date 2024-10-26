@@ -119,9 +119,9 @@ def k_fold_cross_validation(data, openAI_client, n_splits=K_FOLDS, do_training=T
             preprocessed_train = preprocess_dataframe(train_data)
             train_prompt = create_train_prompt(preprocessed_train)
 
-            result_df = openAI_client.generate_examplar_answers(val_data, train_prompt=train_prompt, print=False)
+            result_df = openAI_client.generate_examplar_answers(val_data, train_prompt=train_prompt, do_print=False)
         else:
-            result_df = openAI_client.generate_examplar_answers(val_data, print=False)
+            result_df = openAI_client.generate_examplar_answers(val_data, do_print=False)
 
         generated = result_df[OUTPUT_ROW_NAME].tolist()
         expected = result_df[EXPECTED_ROW_NAME].tolist()
@@ -143,4 +143,4 @@ def print_similarity_results(results, training_done=True):
 
     for method, result in results.items():
         mean_similarity = sum(result) / len(result) if results else 0
-        print(f"{method} mean similarity across {K_FOLDS} folds: {mean_similarity:.4f}")
+        print(f"{method} mean similarity across {K_FOLDS} folds: {mean_similarity:.5f}")

@@ -2,8 +2,8 @@ import os
 from openai import OpenAI
 
 from utils.prompt_generating import create_user_query
-from utils.data_processing import preprocess_dataframe, show_progress_bar
-from config import MODEL_NAME, N_EPOCHS, BATCH_SIZE, LEARNING_RATE_MULTIPLIER, OUTPUT_ROW_NAME
+from utils.data_processing import preprocess_dataframe, show_progress_bar, clean_text, remove_long_entries
+from config import MODEL_NAME, N_EPOCHS, BATCH_SIZE, LEARNING_RATE_MULTIPLIER, OUTPUT_ROW_NAME, TASK_CONTENT_MAX_LENGTH
 
 class OpenAIClient:
     def __init__(self, api_key):
@@ -20,17 +20,22 @@ class OpenAIClient:
             print(f"Error in generate_answer: {e}")
             return None
         
-    def generate_examplar_answers(self, tasks_df, train_prompt=[], print=True):
-        if print:
+    def generate_examplar_answers(self, tasks_df, train_prompt=[], do_print=True):
+        if do_print:
             print("Preprocessing...")
         preprocessed_df = preprocess_dataframe(tasks_df.copy())
+
+        # Remove any questions that have a 'task_content' which exceed a specified length limit
+        preprocessed_df['task_content'] = preprocessed_df['task_content'].apply(clean_text)
+        preprocessed_df = remove_long_entries(preprocessed_df, 'task_content', length_limit=TASK_CONTENT_MAX_LENGTH)
+
         first_row = True
 
         grouped_tasks = preprocessed_df.groupby('task_id')
 
         generated_answers_dict = {}
 
-        if print:
+        if do_print:
             print("Generating examplar answers...")
 
         iteration = 0

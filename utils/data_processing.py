@@ -7,7 +7,8 @@ from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from nltk.data import find
 
-from config import TASK_CONTENT_MAX_LENGTH, QUESTION_MAX_LENGTH, RUBRIC_MAX_LENGTH, NLTK_RESOURCES
+from config import QUESTION_MAX_LENGTH, RUBRIC_MAX_LENGTH, NLTK_RESOURCES, QUESTION_CATEGORY_NAME
+from utils.question import categorize_question
 
 # Download necessary NLTK resources
 def download_nltk_resources():
@@ -27,9 +28,8 @@ def preprocess_dataframe(df):
 
     new_df = fill_missing_task_info(new_df)
 
-    new_df['task_content'] = df['task_content'].apply(clean_text)
+    new_df[QUESTION_CATEGORY_NAME] = new_df['question'].apply(categorize_question)
 
-    new_df = remove_long_entries(new_df, 'task_content', length_limit=TASK_CONTENT_MAX_LENGTH)
     new_df = remove_long_entries(new_df, 'question', length_limit=QUESTION_MAX_LENGTH)
     new_df = remove_long_entries(new_df, 'rubric', length_limit=RUBRIC_MAX_LENGTH)
 

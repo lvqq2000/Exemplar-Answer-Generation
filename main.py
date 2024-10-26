@@ -48,7 +48,7 @@ def generate_exemplar_answers():
 
 def do_validation():
     # Implement the logic for validation
-    print("Performing k fold cross validation on the LLM model...")
+    print(f"Performing {K_FOLDS} fold cross validation on the LLM model...")
 
     training_data = read_json(TRAIN_DATA_PATH)
 

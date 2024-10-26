@@ -13,24 +13,16 @@ VALIDATION_RESULT_PATH = 'output/validation_results.json'
 
 # Input setting
 TASK_CONTENT_MAX_LENGTH = 8000
-QUESTION_MAX_LENGTH = 600
+QUESTION_MAX_LENGTH = 700
 RUBRIC_MAX_LENGTH = 1000
 EXPECTED_ROW_NAME = "answer"
 
 # Output setting
+QUESTION_CATEGORY_NAME = "question_category"
 OUTPUT_ROW_NAME = "examplar_answer"
-OUTPUT_MAX_LENGTH = 700
 
 # Model settings
 MODEL_NAME = 'gpt-4o-mini'
-SYSTEM_PROMPT = {
-    "role": "system", 
-    "content": 
-    f"""
-    You will be provided with a task content, a question related to task content and the rubric which includes indicator (performance indicators for assessing), criteria (what to do to meet the standards), curriculum_codes (curriculum reference codes based on the educational standards).
-    You will assist teachers to follow a consistent style to generate exemplar answers for questions. Maximum {OUTPUT_MAX_LENGTH} characters.
-    """
-    }
 TEST_SIZE = 0.2
 K_FOLDS = 5  # Number of folds for cross-validation
 TFIDF = "TF-IDF"
