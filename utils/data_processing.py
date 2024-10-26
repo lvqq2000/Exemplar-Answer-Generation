@@ -23,15 +23,15 @@ def download_nltk_resources():
 # Call the function to ensure resources are available
 download_nltk_resources()
 
-def preprocess_dataframe(df):
+def preprocess_dataframe(df, do_print=True):
     new_df = df.copy()
 
     new_df = fill_missing_task_info(new_df)
 
     new_df[QUESTION_CATEGORY_NAME] = new_df['question'].apply(categorize_question)
 
-    new_df = remove_long_entries(new_df, 'question', length_limit=QUESTION_MAX_LENGTH)
-    new_df = remove_long_entries(new_df, 'rubric', length_limit=RUBRIC_MAX_LENGTH)
+    new_df = remove_long_entries(new_df, 'question', length_limit=QUESTION_MAX_LENGTH, do_print=do_print)
+    new_df = remove_long_entries(new_df, 'rubric', length_limit=RUBRIC_MAX_LENGTH, do_print=do_print)
 
     # Apply the function to the rubric column and create new columns
     new_df[['indicator', 'criteria', 'curriculum_codes']] = new_df['rubric'].apply(extract_rubric_info)
@@ -123,7 +123,7 @@ def fill_missing_task_info(df):
 
     return df
 
-def remove_long_entries(df, column_name, length_limit=10000):
+def remove_long_entries(df, column_name, length_limit=10000, do_print=True):
     """
     Remove rows from the DataFrame where the specified column exceeds the given length limit.
 
@@ -149,7 +149,8 @@ def remove_long_entries(df, column_name, length_limit=10000):
         neglected_count = len(neglected_ids)
 
         # Print out the summary of entries being removed
-        print(f"{neglected_count} files have been neglected since their '{column_name}' exceeds the length limit of {length_limit} characters. Question IDs: {', '.join(neglected_ids)}")
+        if do_print:
+            print(f"{neglected_count} files have been neglected since their '{column_name}' exceeds the length limit of {length_limit} characters. Question IDs: {', '.join(neglected_ids)}")
 
     # Remove rows exceeding the length limit
     new_df = df[df[column_name].str.len() <= length_limit]

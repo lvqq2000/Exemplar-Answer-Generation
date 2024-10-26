@@ -31,7 +31,7 @@ def create_train_prompt(df):
     You will assist teachers to generate exemplar answers for questions.
     The answer need to align with the rubric, which includes indicator (performance indicators for assessing), criteria (what to do to meet the standards), curriculum_codes (curriculum reference codes based on the educational standards).
     
-    Learn from the following examples of questions, corresponding rubrics and their corresponding answers:
+    Learn from the following examples of questions, and their corresponding answers:
 
     """
 

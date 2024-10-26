@@ -9,7 +9,7 @@ TRAIN_DATA_PATH = 'data/training_data.json'
 VAL_SET_PATH = 'data/val_set.jsonl'
 INPUT_DEFAULT_PATH = 'data/input.json'
 OUTPUT_PATH = 'output/output.json'
-VALIDATION_RESULT_PATH = 'output/validation_results.json'
+OUTPUT_PATH_WITHOUT_TRAINING = 'output/output_no_training.json'
 
 # Input setting
 TASK_CONTENT_MAX_LENGTH = 8000

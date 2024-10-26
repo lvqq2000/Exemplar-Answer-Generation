@@ -20,14 +20,14 @@ class OpenAIClient:
             print(f"Error in generate_answer: {e}")
             return None
         
-    def generate_examplar_answers(self, tasks_df, train_prompt=[], do_print=True):
+    def perfrom_generation(self, tasks_df, train_prompt=[], do_print=True):
         if do_print:
             print("Preprocessing...")
         preprocessed_df = preprocess_dataframe(tasks_df.copy())
 
         # Remove any questions that have a 'task_content' which exceed a specified length limit
         preprocessed_df['task_content'] = preprocessed_df['task_content'].apply(clean_text)
-        preprocessed_df = remove_long_entries(preprocessed_df, 'task_content', length_limit=TASK_CONTENT_MAX_LENGTH)
+        preprocessed_df = remove_long_entries(preprocessed_df, 'task_content', length_limit=TASK_CONTENT_MAX_LENGTH, do_print=do_print)
 
         first_row = True
 

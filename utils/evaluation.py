@@ -11,13 +11,14 @@ from utils.prompt_generating import create_train_prompt
 
 def train_doc2vec_model(data):
     """Trains a Doc2Vec model using preprocessed text from the input DataFrame."""
+    grouped_tasks = data.groupby('task_id')
     documents = [
-        TaggedDocument(words=preprocess_text(row[EXPECTED_ROW_NAME]), tags=[str(row["question_id"])])
-        for _, row in data.iterrows()
+        TaggedDocument(words=preprocess_text(group['task_content'].iloc[0]), tags=[str(task_id)])
+        for task_id, group in grouped_tasks
     ]
     
     # Create and train the Doc2Vec model
-    model = Doc2Vec(vector_size=50, window=2, min_count=1, workers=4, epochs=40)
+    model = Doc2Vec(vector_size=30, window=2, min_count=1, workers=4, epochs=20)
     model.build_vocab(documents)
     model.train(documents, total_examples=model.corpus_count, epochs=model.epochs)
     
@@ -46,7 +47,9 @@ def evaluate_doc2vec_similarity(model, generated_answers, expected_answers):
         generated_vector = model.infer_vector(generated)
         expected_vector = model.infer_vector(expected)
         
-        similarity = 1 - cosine(generated_vector, expected_vector)
+        cosine_distance = cosine(generated_vector, expected_vector)
+        similarity = 1 - (cosine_distance / 2)
+
         results.append(similarity)
     
     return results
@@ -74,8 +77,8 @@ def evaluate_tfidf_similarity(generated_answers, expected_answers):
 
     return similarity_scores
 
-def validation(doc2vec_model_data, result_df):
-    doc2vec_model = train_doc2vec_model(doc2vec_model_data)
+def validation(result_df):
+    doc2vec_model = train_doc2vec_model(result_df)
 
     try:
         # Check if the DataFrame is not empty
@@ -116,7 +119,7 @@ def k_fold_cross_validation(data, openAI_client, n_splits=K_FOLDS, do_training=T
         train_data, val_data = data.iloc[train_index], data.iloc[val_index]
 
         if do_training:
-            preprocessed_train = preprocess_dataframe(train_data)
+            preprocessed_train = preprocess_dataframe(train_data, do_print=False)
             train_prompt = create_train_prompt(preprocessed_train)
 
             result_df = openAI_client.generate_examplar_answers(val_data, train_prompt=train_prompt, do_print=False)
@@ -136,11 +139,12 @@ def k_fold_cross_validation(data, openAI_client, n_splits=K_FOLDS, do_training=T
 
 def print_similarity_results(results, training_done=True):
     if training_done:
-        print("When the LLM model undergoes training:")
+        print("\nWhen the LLM model undergoes training:")
     else:
-        print("When the LLM model doesn't undergo training:")
-
+        print("\nWhen the LLM model doesn't undergo training:")
 
     for method, result in results.items():
         mean_similarity = sum(result) / len(result) if results else 0
         print(f"{method} mean similarity across {K_FOLDS} folds: {mean_similarity:.5f}")
+
+    print()
