@@ -59,14 +59,14 @@ def do_validation():
 
     print("Without training:")
     client_without_training = OpenAIClient(api_key=OPENAI_API_KEY)
-    result_without_training = k_fold_cross_validation(training_data_df, client_without_training, doTraining=False)
+    result_without_training = k_fold_cross_validation(training_data_df, client_without_training, do_training=False)
 
     client = OpenAIClient(api_key=OPENAI_API_KEY)
-    result = k_fold_cross_validation(training_data_df, client, doTraining=True)
+    result = k_fold_cross_validation(training_data_df, client, do_training=True)
 
     print("With training:")
-    print_similarity_results(result_without_training, doTraining=False)
-    print_similarity_results(result, doTraining=True)
+    print_similarity_results(result_without_training, training_done=False)
+    print_similarity_results(result, training_done=True)
 
     print("\nNote: The folds for 'undergoes training' and 'does not undergo training' are randomly chosen and may not be the same.")
     return

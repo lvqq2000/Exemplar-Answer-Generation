@@ -104,7 +104,7 @@ def validation(doc2vec_model_data, result_df):
     print("TF_IDF similarity score is ", np.mean(tfidf_evaluation_results))
 
 
-def k_fold_cross_validation(data, openAI_client, n_splits=K_FOLDS, doTraining=True):
+def k_fold_cross_validation(data, openAI_client, n_splits=K_FOLDS, do_training=True):
     kf = KFold(n_splits=n_splits)
 
     doc2vec_model = train_doc2vec_model(data)
@@ -115,7 +115,7 @@ def k_fold_cross_validation(data, openAI_client, n_splits=K_FOLDS, doTraining=Tr
 
         train_data, val_data = data.iloc[train_index], data.iloc[val_index]
 
-        if doTraining:
+        if do_training:
             preprocessed_train = preprocess_dataframe(train_data)
             train_prompt = create_train_prompt(preprocessed_train)
 
