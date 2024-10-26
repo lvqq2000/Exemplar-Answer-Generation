@@ -6,7 +6,7 @@ OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
 
 # File paths
 TRAIN_DATA_PATH = 'data/training_data.json'
-VAL_SET_PATH = 'data/val_set.jsonl'
+VAL_SET_PATH = 'data/val_set.json'
 INPUT_DEFAULT_PATH = 'data/input.json'
 OUTPUT_PATH = 'output/output.json'
 OUTPUT_PATH_WITHOUT_TRAINING = 'output/output_no_training.json'

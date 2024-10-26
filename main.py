@@ -4,8 +4,8 @@ from sklearn.model_selection import train_test_split
 
 from utils.file_io import read_json, save_df_to_json
 from utils.data_processing import preprocess_dataframe
-from utils.prompt_generating import create_train_prompt
-from utils.openai_api import OpenAIClient
+from llm.prompt_generating import create_train_prompt
+from llm.openai_api import OpenAIClient
 from utils.evaluation import validation, k_fold_cross_validation, print_similarity_results
 from config import *
 

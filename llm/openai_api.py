@@ -1,7 +1,7 @@
 import os
 from openai import OpenAI
 
-from utils.prompt_generating import create_user_query
+from prompt_generating import create_user_query
 from utils.data_processing import preprocess_dataframe, show_progress_bar, clean_text, remove_long_entries
 from config import MODEL_NAME, N_EPOCHS, BATCH_SIZE, LEARNING_RATE_MULTIPLIER, OUTPUT_ROW_NAME, TASK_CONTENT_MAX_LENGTH
 

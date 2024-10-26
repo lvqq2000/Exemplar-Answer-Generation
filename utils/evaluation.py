@@ -7,7 +7,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from config import K_FOLDS, OUTPUT_ROW_NAME, EXPECTED_ROW_NAME, TFIDF, DOC2VEC
 from utils.data_processing import preprocess_dataframe, preprocess_text
-from utils.prompt_generating import create_train_prompt
+from llm.prompt_generating import create_train_prompt
 
 def train_doc2vec_model(data):
     """Trains a Doc2Vec model using preprocessed text from the input DataFrame."""
