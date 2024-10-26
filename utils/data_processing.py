@@ -1,33 +1,52 @@
 import pandas as pd
 import json
 import re
-#from sklearn.model_selection import KFold
-from config import TASK_CONTENT_MAX_LENGTH, QUESTION_MAX_LENGTH, RUBRIC_MAX_LENGTH
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+from nltk.data import find
+
+from config import TASK_CONTENT_MAX_LENGTH, QUESTION_MAX_LENGTH, RUBRIC_MAX_LENGTH, NLTK_RESOURCES
+
+# Download necessary NLTK resources
+def download_nltk_resources():
+    resources = NLTK_RESOURCES
+
+    for resource in resources:
+        try:
+            find(f'corpora/{resource}.zip')  # Check for corpus resources
+        except LookupError:
+            nltk.download(resource)
+
+# Call the function to ensure resources are available
+download_nltk_resources()
 
 def preprocess_dataframe(df):
-    df = fill_missing_task_info(df)
+    new_df = df.copy()
 
-    df['task_content'] = df['task_content'].apply(clean_text)
+    new_df = fill_missing_task_info(new_df)
 
-    df = remove_long_entries(df, 'task_content', length_limit=TASK_CONTENT_MAX_LENGTH)
-    df = remove_long_entries(df, 'question', length_limit=QUESTION_MAX_LENGTH)
-    df = remove_long_entries(df, 'rubric', length_limit=RUBRIC_MAX_LENGTH)
+    new_df['task_content'] = df['task_content'].apply(clean_text)
+
+    new_df = remove_long_entries(new_df, 'task_content', length_limit=TASK_CONTENT_MAX_LENGTH)
+    new_df = remove_long_entries(new_df, 'question', length_limit=QUESTION_MAX_LENGTH)
+    new_df = remove_long_entries(new_df, 'rubric', length_limit=RUBRIC_MAX_LENGTH)
 
     # Apply the function to the rubric column and create new columns
-    df[['indicator', 'criteria', 'curriculum_codes']] = df['rubric'].apply(extract_rubric_info)
+    new_df[['indicator', 'criteria', 'curriculum_codes']] = new_df['rubric'].apply(extract_rubric_info)
 
     # Convert curriculum_codes column to strings
-    df['curriculum_codes'] = df['curriculum_codes'].apply(lambda x: json.dumps(x, sort_keys=True))
+    new_df['curriculum_codes'] = new_df['curriculum_codes'].apply(lambda x: json.dumps(x, sort_keys=True))
 
     # Drop the original rubric column if no longer needed
-    df.drop(columns=['rubric'], inplace=True)
+    new_df.drop(columns=['rubric'], inplace=True)
 
-    df = df.dropna()
+    new_df = new_df.dropna()
 
-    df = df.drop_duplicates()
+    new_df = new_df.drop_duplicates()
 
-    # return df.to_dict(orient='records')  # Convert back to list of dicts
-    return df
+    return new_df
 
 def clean_text(text):
     # Remove all HTML entities and tags
@@ -44,6 +63,23 @@ def clean_text(text):
     text = text.strip()
     
     return text
+
+def preprocess_text(text):
+    """Preprocesses the input text by lowercasing, removing punctuation,
+       tokenizing, removing stopwords, and lemmatizing."""
+    # Lowercase
+    text = text.lower()
+    # Remove punctuation
+    text = re.sub(r'[^\w\s]', '', text)
+    # Tokenize
+    words = word_tokenize(text)
+    # Remove stop words
+    stop_words = set(stopwords.words('english'))
+    words = [word for word in words if word not in stop_words]
+    # Lemmatize
+    lemmatizer = WordNetLemmatizer()
+    words = [lemmatizer.lemmatize(word) for word in words]
+    return words
 
 # Function to extract the desired values from the rubric
 def extract_rubric_info(rubric):
@@ -106,9 +142,14 @@ def remove_long_entries(df, column_name, length_limit=10000):
     # Identify rows to be removed
     to_remove = df[df[column_name].str.len() > length_limit]
 
-    # Print out entries being removed
-    for index, row in to_remove.iterrows():
-        print(f"Row with ID {row['question_id']} has been neglected since its '{column_name}' exceeds the length limit of {length_limit} characters.")
+    # Check if there are any rows to be removed
+    if not to_remove.empty:
+        # Collect question IDs to print
+        neglected_ids = to_remove['question_id'].tolist()
+        neglected_count = len(neglected_ids)
+
+        # Print out the summary of entries being removed
+        print(f"{neglected_count} files have been neglected since their '{column_name}' exceeds the length limit of {length_limit} characters. Question IDs: {', '.join(neglected_ids)}")
 
     # Remove rows exceeding the length limit
     new_df = df[df[column_name].str.len() <= length_limit]

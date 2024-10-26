@@ -3,7 +3,7 @@ from openai import OpenAI
 
 from utils.prompt_generating import create_user_query
 from utils.data_processing import preprocess_dataframe, show_progress_bar
-from config import MODEL_NAME, N_EPOCHS, BATCH_SIZE, LEARNING_RATE_MULTIPLIER
+from config import MODEL_NAME, N_EPOCHS, BATCH_SIZE, LEARNING_RATE_MULTIPLIER, OUTPUT_ROW_NAME
 
 class OpenAIClient:
     def __init__(self, api_key):
@@ -20,21 +20,26 @@ class OpenAIClient:
             print(f"Error in generate_answer: {e}")
             return None
         
-    def generate_examplar_answers(self, tasks_df, train_prompt):
-        print("Preprocessing...")
+    def generate_examplar_answers(self, tasks_df, train_prompt=[], print=True):
+        if print:
+            print("Preprocessing...")
         preprocessed_df = preprocess_dataframe(tasks_df.copy())
         first_row = True
 
         grouped_tasks = preprocessed_df.groupby('task_id')
 
         generated_answers_dict = {}
-        
-        print("Generating examplar answers...")
+
+        if print:
+            print("Generating examplar answers...")
+
         iteration = 0
         for task_id, group in grouped_tasks:
             for index, row in group.iterrows():
                 iteration += 1
+
                 show_progress_bar(iteration, preprocessed_df.shape[0])
+
                 if first_row:
                     first_row = False
                     generated_answer = self.generate_answer(train_prompt + [create_user_query(row, task_content=row['task_content'])])
@@ -47,12 +52,12 @@ class OpenAIClient:
                     return None
                 generated_answers_dict[row['question_id']] = generated_answer
         
-        tasks_df['exemplar_answer'] = tasks_df['question_id'].map(generated_answers_dict)
+        new_tasks_df = tasks_df.assign(**{OUTPUT_ROW_NAME: tasks_df['question_id'].map(generated_answers_dict)})
 
         # Drop rows where there is no generated exemplar_answer
-        tasks_df = tasks_df.dropna(subset=['exemplar_answer'])
+        new_tasks_df = new_tasks_df.dropna(subset=[OUTPUT_ROW_NAME])
 
-        return tasks_df
+        return new_tasks_df
 
     def upload_dataset(self, train_file_path, validation_file_path):
         try:

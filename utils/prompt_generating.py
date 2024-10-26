@@ -1,10 +1,10 @@
-from config import ANSWER_MAX_LENGTH
+from config import SYSTEM_PROMPT
 
 def create_train_prompt(df):
     print("Creating prompts based on training data...")
 
     grouped_tasks = df.groupby('task_content')
-    train_prompt = [{"role": "system", "content": f"You will be provided with a task content, a question related to task content and the rubric which includes indicator (performance indicators for assessing), criteria (what to do to meet the standards), curriculum_codes (curriculum reference codes based on the educational standards). You will assist teachers to follow a consistent style to generate exemplar answers for questions. Maximum {ANSWER_MAX_LENGTH} characters. "}]
+    train_prompt = [SYSTEM_PROMPT]
     for task_content, group in grouped_tasks:
         for index, row in group.iterrows(): 
             if index == 0:
@@ -16,7 +16,6 @@ def create_train_prompt(df):
                 "role": "assistant",
                 "content": row['answer']
             })
-    print("Done")
     return train_prompt
 
 def create_user_query(row, task_content=None):

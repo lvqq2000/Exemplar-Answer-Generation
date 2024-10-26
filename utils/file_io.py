@@ -21,7 +21,7 @@ def read_json(file_path):
 def save_df_to_json(df, output_file_path):
     try:
         df.to_json(output_file_path, orient='records', indent=4)
-        print(f"DataFrame successfully saved to {output_file_path}")
+        print(f"Data successfully saved to {output_file_path}")
     except FileNotFoundError:
         print(f"Error: The directory for '{output_file_path}' was not found.")
     except PermissionError:
