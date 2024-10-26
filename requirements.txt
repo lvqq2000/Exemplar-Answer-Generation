@@ -3,3 +3,4 @@ python-dotenv>=0.20.0
 pandas
 matplotlib
 scikit-learn
+nltk

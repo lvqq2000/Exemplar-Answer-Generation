@@ -2,40 +2,45 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
-from utils.file_io import read_json, save_to_jsonl
-from utils.data_processing import preprocess_data, clean_text
+from utils.file_io import read_json, save_df_to_json
+from utils.data_processing import preprocess_dataframe
+from utils.prompt_generating import create_train_prompt
 from utils.openai_api import OpenAIClient
-from config import OPENAI_API_KEY, TRAIN_DATA_PATH, TRAIN_SET_PATH, VAL_SET_PATH, TRAIN_FILE_ID, VALIDATION_FILE_ID, FINE_TUNING_JOB_ID
-
+from config import OPENAI_API_KEY, TRAIN_DATA_PATH, INPUT_DEFAULT_PATH, VAL_SET_PATH, OUTPUT_PATH
 
 def main():
     # Read input data
     openAI_client = OpenAIClient(api_key=OPENAI_API_KEY)
 
-    #input_data = read_json(TRAIN_DATA_PATH)
+    training_data = read_json(TRAIN_DATA_PATH)
 
-    #preprocessed_data = preprocess_data(input_data)
+    training_data_df = pd.DataFrame(training_data)
 
-    #train_data, validation_data = train_test_split(preprocessed_data, test_size=0.2, random_state=42)
+    train_df, validation_df = train_test_split(training_data_df, test_size=0.2, random_state=42)
 
-    #save_to_jsonl(train_data, TRAIN_SET_PATH)
-    #save_to_jsonl(validation_data, VAL_SET_PATH)
+    print("Saving validation data for testing...")
+    save_df_to_json(validation_df, VAL_SET_PATH)
+    save_df_to_json(validation_df, INPUT_DEFAULT_PATH)
 
-    #openAI_client.upload_dataset(TRAIN_SET_PATH, VAL_SET_PATH)
+    print("Preparing the training data...")
+    preprocessed_train = preprocess_dataframe(train_df)
 
-    #openAI_client.do_fine_tuning(TRAIN_FILE_ID, VALIDATION_FILE_ID)
+    train_prompt = create_train_prompt(preprocessed_train)
 
-    #openAI_client.check_fine_tuning(FINE_TUNING_JOB_ID)
+    # validation
+    #openAI_client.generate_examplar_answers(validation_df, train_prompt)
 
-    #openAI_client.obtain_fine_tuned_model_name()
+    input_file_path = input(f"Enter the input file path (default: {INPUT_DEFAULT_PATH}):")
+    if input_file_path:
+        user_input = read_json(input_file_path)
+    else:
+        user_input = read_json(INPUT_DEFAULT_PATH)
 
-    while True:
-        task_content = input("Enter the task content: ")
-        question = input("Enter the question: ")
-        rubric = input("Enter the rubric (in JSON format): ")
-        answer = openAI_client.generate_answer(task_content, question, clean_text(rubric))
-        if answer:
-            print("Generated exemplar Answer:", answer)
+    if user_input:
+        input_df = pd.DataFrame(user_input)
+        result_df = openAI_client.generate_examplar_answers(input_df, train_prompt)
+        if result_df is not None:
+            save_df_to_json(result_df, OUTPUT_PATH)
 
 if __name__ == "__main__":
     main()

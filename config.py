@@ -6,11 +6,20 @@ OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
 
 # File paths
 TRAIN_DATA_PATH = 'data/training_data.json'
-TRAIN_SET_PATH = 'data/train_set.jsonl'
 VAL_SET_PATH = 'data/val_set.jsonl'
+INPUT_DEFAULT_PATH = 'data/input.json'
+OUTPUT_PATH = 'output/output.json'
+
+# Input setting
+TASK_CONTENT_MAX_LENGTH = 8000
+QUESTION_MAX_LENGTH = 600
+RUBRIC_MAX_LENGTH = 1000
+
+# Output setting
+ANSWER_MAX_LENGTH = 700
 
 # Model settings
-MODEL_NAME = 'gpt-4o-mini-2024-07-18'
+MODEL_NAME = 'gpt-4o-mini'
 K_FOLDS = 5  # Number of folds for cross-validation
 
 # Fine-turning
