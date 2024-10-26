@@ -12,24 +12,27 @@ This project aims to integrate the OpenAI API to generate exemplar answers for v
 ## Structure
 ```
 .
-├── data                             # Stores input and training data files used in the project.
-│   ├── input.json                   # default file to fetch input data.
-│   └── training_data.json           # Training data for the OpenAI model.
-├── output                           # Folder to store generated output files.
-├── llm                              # Contains logic specific to large language model (LLM) interaction.
-│   ├── openai_api.py                # Script to interact with the OpenAI API, managing API calls and responses.
-│   └── prompt_generating.py         # Script for creating prompt messages to send to the OpenAI model.
-├── utils                            # Helper functions and utilities to support various tasks across the project.
+├── data                                # Stores input and training data files used in the project.
+│   ├── input.json                      # Default file to for system to fetch input data.
+│   └── training_data.json              # Training data for the OpenAI model.
+├── output                              # Folder to store generated output files.
+│   ├── example_output_no_training.json # Example output genereated by untrained model.
+│   └── example_output.json             # Example output genereated by trained model.
+├── llm                                 # Contains logic specific to large language model (LLM) interaction.
 │   ├── __init__.py
-│   ├── data_processing.py           # Contains functions to preprocess, clean, and format data before model input.
-│   ├── evaluation.py                # Script to evaluate model outputs by comparing predictions with expected results.
-│   ├── file_io.py                   # Handles file input/output operations, like reading from and saving to JSON files.
-│   └── question.py                  # Helper file for question-related processing and categorization.
-├── .gitignore                       # Specifies files and directories to ignore in version control, like `.env` and `__pycache__`.
-├── config.py                        # Stores configuration variables, constants, and paths used across the project.
-├── main.py                          # Entry point of the application, orchestrating the workflow and executing main functions.
-├── requirements.txt                 # Lists dependencies needed for the project.
-└── README.md                        # Project documentation with setup instructions, usage guidelines, and overview of the project.
+│   ├── openai_api.py                   # Script to interact with the OpenAI API, managing API calls and responses.
+│   └── prompt_generating.py            # Script for creating prompt messages to send to the OpenAI model.
+├── utils                               # Helper functions and utilities to support various tasks across the project.
+│   ├── __init__.py
+│   ├── data_processing.py              # Contains functions to preprocess, clean, and format data before model input.
+│   ├── evaluation.py                   # Script to evaluate model outputs by comparing predictions with expected results.
+│   ├── file_io.py                      # Handles file input/output operations, like reading from and saving to JSON files.
+│   └── question.py                     # Helper file for question-related processing and categorization.
+├── .gitignore                          # Specifies files and directories to ignore in version control, like `.env` and `__pycache__`.
+├── config.py                           # Stores configuration variables, constants, and paths used across the project.
+├── main.py                             # Entry point of the application, orchestrating the workflow and executing main functions.
+├── requirements.txt                    # Lists dependencies needed for the project.
+└── README.md                           # Project documentation with setup instructions, usage guidelines, and overview of the project.
 ```
 
 ## Set up
@@ -122,5 +125,9 @@ To evaluate the quality of generated answers, proceed with these steps:
 
 
 ## Testing and Evaluation
-The model uses k-fold cross-validation (default: 5) to assess performance. This validation will be conducted in two scenarios: with model training and without. For each fold, it will use the Doc2Vec model and TF-IDF model to measure the similarity between the generated answers and the sample training data. The mean similarity score will be calculated and printed to the concole once all folds are processed. To perform the evaluation, see [Performing Model Validation](#performing-model-validation).
+The model uses k-fold cross-validation (default: 5) to assess performance. This validation will be conducted in two scenarios: with model training and without. For each fold, it will use the Doc2Vec model and TF-IDF model to measure the similarity between the generated answers and the sample training data. The mean similarity score will be calculated and printed to the concole once all folds are processed.
 
+To perform the evaluation, see [Performing Model Validation](#performing-model-validation).
+
+### Sample outputs for evaluation
+Sample outputs produced by both the untrained model and the trained model have been provided as [example_output_no_training.json](output/example_output_no_training.json) and [example_output.json](output/example_output.json). Both files contain 20 identical questions, along with sample answers and generated answers from the model.
