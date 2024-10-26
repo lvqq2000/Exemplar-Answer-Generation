@@ -16,6 +16,7 @@ def create_train_prompt(df):
                 "role": "assistant",
                 "content": row['answer']
             })
+    print("Prompts have been successfully created.")
     return train_prompt
 
 def create_user_query(row, task_content=None):

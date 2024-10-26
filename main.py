@@ -29,9 +29,6 @@ def generate_exemplar_answers():
     save_df_to_json(validation_df, INPUT_DEFAULT_PATH)
     print("Validation data is ready for testing.")
 
-    # validation
-    #openAI_client.generate_examplar_answers(validation_df, train_prompt)
-
     input_file_path = input(f"Enter the input file path (default: {INPUT_DEFAULT_PATH}):") or INPUT_DEFAULT_PATH
     user_input = read_json(input_file_path)
 
@@ -64,7 +61,7 @@ def do_validation():
     client = OpenAIClient(api_key=OPENAI_API_KEY)
     result = k_fold_cross_validation(training_data_df, client, do_training=True)
 
-    print("With training:")
+    print("\nWith training:")
     print_similarity_results(result_without_training, training_done=False)
     print_similarity_results(result, training_done=True)
 
